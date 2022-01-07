@@ -1,0 +1,1 @@
+<h1 class="text-gray-200 text-3xl font-bold">Aboot</h1>
