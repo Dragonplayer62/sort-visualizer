@@ -15,7 +15,7 @@ export function generateRandomArray(min:number, max:number, length:number):Visua
   return arr;
 }
 
-export function booba(arr:Visual[], delay:number, container:HTMLDivElement, frag:DocumentFragment):void{
+export function startSort(arr:Visual[], delay:number, container:HTMLDivElement, frag:DocumentFragment):void{
   initBS(arr);
   handle = setInterval(()=>cont(arr, container, handle, frag), delay);
   cont(arr, container, handle, frag);

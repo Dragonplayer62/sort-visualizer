@@ -2,7 +2,7 @@
 	import {onMount} from 'svelte';
 
   import {generateRandomArray} from "../$lib/sorting";
-	import {booba} from "../$lib/sorting";
+	import {startSort} from "../$lib/sorting";
 	import {updateVis} from "../$lib/visualization";
 	import type {Visual} from "../$lib/visualization"
 
@@ -32,7 +32,7 @@
 		Randomize Array
 	</button>
 	<br>
-	<button on:click="{()=>{booba(arr, delay, container, frag);}}" class="rounded-md text-lg text-gray-200 bg-zinc-500">
+	<button on:click="{()=>{startSort(arr, delay, container, frag);}}" class="rounded-md text-lg text-gray-200 bg-zinc-500">
 		<p class="mx-4">Sort</p>
 	</button>
 	<div id="wrapper" class="flex justify-center items-start bg-gray-600 h-84 py-2 text-white text-center">
