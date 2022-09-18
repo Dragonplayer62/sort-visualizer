@@ -6,9 +6,19 @@
   let authToken='';
   let streams = [];
   let searchLang = '';
-  let isLoading = false;
+  let pagination = ''; //for scrolling
+  let isLoading = false; //for displaying a loading screen
 
   async function getStreams(){
+    if(searchLang.length === 0){
+      alert("Please input a language");
+      return
+    }
+    if(searchLang.length > 2){
+      alert("Input must be 2 characters long");
+      return
+    }
+
     isLoading = true;
     await validateAuth();
     const extraParams = new URLSearchParams();
@@ -33,15 +43,16 @@
       alert("Could not find any streams of that language");
       return
     }
-    const loadedStreams = data.data.map((data) => {
-      let str = data.thumbnail_url.replace('{width}', '320').replace('{height}', '180');
+    pagination = data.pagination.cursor;
+    const loadedStreams = data.data.map((stream) => {
+      let str = stream.thumbnail_url.replace('{width}', '320').replace('{height}', '180');
       return {
         thumbnail_url: str,
-        user_name: data.user_login,
-        localized_name: data.user_name,
-        title: data.title,
-        game_name: data.game_name,
-        viewer_count: data.viewer_count
+        user_name: stream.user_login,
+        localized_name: stream.user_name,
+        title: stream.title,
+        game_name: stream.game_name,
+        viewer_count: stream.viewer_count
       }
     })
     streams = loadedStreams;
@@ -67,26 +78,27 @@
     <title>Twitch Language Search</title>
 </svelte:head>
 
-<main class="my-4 text-2xl text-gray-200 text-center">
+<main class="my-4 text-xl text-gray-200 text-center">
   <body>
     <h1 class="text-4xl text-center my-8 uppercase text-gray-800 dark:text-gray-100">Search Twitch streams of specific language</h1>
+
     <div class="flex flex-col">
       <form on:submit|preventDefault={getStreams}>
         <input bind:value={searchLang} type="text" placeholder="ja"class="text-gray-800 p-2 rounded-md"/>
-        <button class="bg-gray-400 p-4 rounded-md">
+        <button class="bg-green-700 p-4 rounded-md">
           Find Streams
         </button>
       </form>
     </div>
     
     <div>
-      Language must in be two letter form. Example: ja for Japanese, de for German
+      Language must in be two letter form. Example: "ja" for Japanese, "de" for German
     </div>
     <a class="underline text-blue-600 hover:text-blue-800 visited:text-purple-600" href="https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes" target="_blank" rel="noopener noreferrer">
       See this table
     </a>
 
-    <div class=" py-4 grid gap-4 md:grid-cols-3 grid-cols1">
+    <div class="m-2 grid gap-4 md:grid-cols-5 grid-cols1">
       {#if streams.length > 0}
         {#each streams as streamer}
           <TwitchCard streamer = {streamer}/>
