@@ -24,6 +24,9 @@
     const extraParams = new URLSearchParams();
     extraParams.append('language', searchLang);
     extraParams.append('first', '50');
+    if(pagination.length>0){
+      extraParams.append('after', pagination);
+    }
 
     const url = `https://api.twitch.tv/helix/streams?${extraParams}`;
 
@@ -57,6 +60,7 @@
     })
     streams = loadedStreams;
     isLoading = false;
+    scrollTo({top: 0, left: 0, behavior: 'smooth'});
   }
 
   async function validateAuth(){
@@ -105,5 +109,12 @@
         {/each}
       {/if}
     </div>
+
+    {#if streams.length > 0}
+    <button on:click={getStreams} class="bg-green-700 p-4 rounded-md">
+      Load more...
+    </button>
+    {/if}
+
   </body>
 </main>
