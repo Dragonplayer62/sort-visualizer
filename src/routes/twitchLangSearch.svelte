@@ -1,80 +1,34 @@
 <script>
-  import { getAuthToken } from "../$lib/twitch";
   import TwitchCard from "../$lib/twitchCard.svelte"
 
-  const clientID = 'buolpx11e3dk9bubm5x8pj95wzwg99'; //public
-  let authToken='';
   let streams = [];
   let searchLang = '';
   let pagination = ''; //for scrolling
   let isLoading = false; //for displaying a loading screen
 
   async function getStreams(){
-    if(searchLang.length === 0){
-      alert("Please input a language");
-      return
-    }
-    if(searchLang.length > 2){
-      alert("Input must be 2 characters long");
+    if(searchLang.length != 2){
+      alert("Language code must be 2 characters long");
       return
     }
 
     isLoading = true;
-    await validateAuth();
-    const extraParams = new URLSearchParams();
-    extraParams.append('language', searchLang);
-    extraParams.append('first', '50');
-    if(pagination.length>0){
-      extraParams.append('after', pagination);
-    }
-
-    const url = `https://api.twitch.tv/helix/streams?${extraParams}`;
-
-    const res = await fetch(url, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${authToken}`,
-        'Client-Id' : clientID,
-      },
-    })
+    const params = new URLSearchParams();
+    params.append('lang', searchLang);
+    params.append('pag', pagination);
+    params.append('amnt', '20');
+    
+    const res = await fetch(`http://188.34.185.31/twitch?${params}`);
     if(!res.ok){
-      alert("Something went wrong on Twitch's end");
+      alert("Something went wrong here");
+      console.log(res);
       return
     }
     const data = await res.json();
-    if(data.data.length === 0){
-      alert("Could not find any streams of that language");
-      return
-    }
-    pagination = data.pagination.cursor;
-    const loadedStreams = data.data.map((stream) => {
-      let str = stream.thumbnail_url.replace('{width}', '320').replace('{height}', '180');
-      return {
-        thumbnail_url: str,
-        user_name: stream.user_login,
-        localized_name: stream.user_name,
-        title: stream.title,
-        game_name: stream.game_name,
-        viewer_count: stream.viewer_count
-      }
-    })
-    streams = loadedStreams;
+    pagination = data.pagination;
+    streams = data.streams;
     isLoading = false;
     scrollTo({top: 0, left: 0, behavior: 'smooth'});
-  }
-
-  async function validateAuth(){
-    authToken = await getAuthToken(clientID);
-    const res = await fetch('https://id.twitch.tv/oauth2/validate', {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${authToken}`
-      },
-    })
-    if(!res.ok){
-      console.log('Refreshing auth token')
-      validateAuth();
-    }
   }
 </script>
 
